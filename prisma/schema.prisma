@@ -34,10 +34,14 @@ model Coupon {
   maxUsage            Int?
   usageCount          Int           @default(0)
   maxUsagePerUser     Int           @default(1)
+  allowedTypes        String?       // JSON: ["courses", "ebooks", "books", "classes"]
   allowedUniversities String?
   allowedSemesters    String?
   allowedStates       String?
   allowedCourseIds    String?
+  allowedEbookIds     String?
+  allowedBookIds      String?
+  allowedClassIds     String?
   expiresAt           DateTime?
   isActive            Boolean       @default(true)
   createdAt           DateTime      @default(now())
@@ -52,6 +56,9 @@ model CouponUsage {
   couponId       Int
   userId         String
   courseId       Int?
+  ebookId        Int?
+  bookId         Int?
+  classId        Int?
   discountAmount Float
   originalAmount Float
   usedAt         DateTime @default(now())

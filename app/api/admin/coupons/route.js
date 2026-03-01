@@ -47,8 +47,16 @@ export async function POST(request) {
                     ? JSON.stringify(data.allowedSemesters) : null,
                 allowedStates: data.allowedStates?.length
                     ? JSON.stringify(data.allowedStates) : null,
+                allowedTypes: data.allowedTypes?.length
+                    ? JSON.stringify(data.allowedTypes) : null,
                 allowedCourseIds: data.allowedCourseIds?.length
                     ? JSON.stringify(data.allowedCourseIds) : null,
+                allowedEbookIds: data.allowedEbookIds?.length
+                    ? JSON.stringify(data.allowedEbookIds) : null,
+                allowedBookIds: data.allowedBookIds?.length
+                    ? JSON.stringify(data.allowedBookIds) : null,
+                allowedClassIds: data.allowedClassIds?.length
+                    ? JSON.stringify(data.allowedClassIds) : null,
                 expiresAt: data.expiresAt ? new Date(data.expiresAt) : null,
                 isActive: data.isActive !== false,
             }
@@ -80,7 +88,11 @@ export async function PATCH(request) {
         if (updates.allowedUniversities !== undefined) formatted.allowedUniversities = updates.allowedUniversities?.length ? JSON.stringify(updates.allowedUniversities) : null;
         if (updates.allowedSemesters !== undefined) formatted.allowedSemesters = updates.allowedSemesters?.length ? JSON.stringify(updates.allowedSemesters) : null;
         if (updates.allowedStates !== undefined) formatted.allowedStates = updates.allowedStates?.length ? JSON.stringify(updates.allowedStates) : null;
+        if (updates.allowedTypes !== undefined) formatted.allowedTypes = updates.allowedTypes?.length ? JSON.stringify(updates.allowedTypes) : null;
         if (updates.allowedCourseIds !== undefined) formatted.allowedCourseIds = updates.allowedCourseIds?.length ? JSON.stringify(updates.allowedCourseIds) : null;
+        if (updates.allowedEbookIds !== undefined) formatted.allowedEbookIds = updates.allowedEbookIds?.length ? JSON.stringify(updates.allowedEbookIds) : null;
+        if (updates.allowedBookIds !== undefined) formatted.allowedBookIds = updates.allowedBookIds?.length ? JSON.stringify(updates.allowedBookIds) : null;
+        if (updates.allowedClassIds !== undefined) formatted.allowedClassIds = updates.allowedClassIds?.length ? JSON.stringify(updates.allowedClassIds) : null;
 
         const updated = await prisma.coupon.update({ where: { id: Number(id) }, data: formatted });
         return NextResponse.json(updated);

@@ -64,6 +64,7 @@ function CheckoutContent() {
                     userId: user?.id || null,
                     item: {
                         id: item?.id,
+                        type: type,
                         price: item?.price ?? subtotal,
                         university: item?.university,
                         semester: item?.semester,
@@ -155,7 +156,8 @@ function CheckoutContent() {
                                     body: JSON.stringify({
                                         couponId: couponState.couponId,
                                         userId: user.id,
-                                        courseId: type === 'courses' ? Number(itemId) : null,
+                                        type: type,
+                                        productId: itemId,
                                         discountAmount: couponState.discountAmount,
                                         originalAmount: subtotal,
                                     })

@@ -5,7 +5,7 @@ import { recordCouponUsage } from '@/lib/couponController';
 
 export async function POST(request) {
     try {
-        const { couponId, userId, courseId, discountAmount, originalAmount } = await request.json();
+        const { couponId, userId, type, productId, discountAmount, originalAmount } = await request.json();
 
         if (!couponId || !userId) {
             return NextResponse.json({ error: 'couponId and userId are required.' }, { status: 400 });
@@ -14,7 +14,8 @@ export async function POST(request) {
         await recordCouponUsage({
             couponId: Number(couponId),
             userId,
-            courseId,
+            type: type || 'courses',
+            productId: productId || null,
             discountAmount: Number(discountAmount),
             originalAmount: Number(originalAmount),
         });

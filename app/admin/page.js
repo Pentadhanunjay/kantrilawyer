@@ -51,7 +51,14 @@ export default function AdminDashboard() {
     const [coupons, setCoupons] = useState([]);
     const [couponAnalytics, setCouponAnalytics] = useState(null); // { usages, totalDiscountGiven, useCount }
     const [showCouponForm, setShowCouponForm] = useState(false);
-    const [couponForm, setCouponForm] = useState({ code: '', description: '', type: 'percentage', value: '', minOrderAmount: 0, maxUsage: '', maxUsagePerUser: 1, allowedUniversities: [], allowedSemesters: [], allowedStates: [], expiresAt: '', isActive: true });
+    const [couponForm, setCouponForm] = useState({
+        code: '', description: '', type: 'percentage', value: '',
+        minOrderAmount: 0, maxUsage: '', maxUsagePerUser: 1,
+        allowedUniversities: [], allowedSemesters: [], allowedStates: [],
+        allowedTypes: [], allowedCourseIds: [], allowedEbookIds: [],
+        allowedBookIds: [], allowedClassIds: [],
+        expiresAt: '', isActive: true
+    });
     const [editingCouponId, setEditingCouponId] = useState(null); // null = create mode, number = edit mode
 
     // Course specialized fields
@@ -1337,7 +1344,14 @@ export default function AdminDashboard() {
                         {activeTab === 'coupons' && (() => {
                             const now = new Date();
 
-                            const BLANK_FORM = { code: '', description: '', type: 'percentage', value: '', minOrderAmount: 0, maxUsage: '', maxUsagePerUser: 1, allowedUniversities: [], allowedSemesters: [], allowedStates: [], expiresAt: '', isActive: true };
+                            const BLANK_FORM = {
+                                code: '', description: '', type: 'percentage', value: '',
+                                minOrderAmount: 0, maxUsage: '', maxUsagePerUser: 1,
+                                allowedUniversities: [], allowedSemesters: [], allowedStates: [],
+                                allowedTypes: [], allowedCourseIds: [], allowedEbookIds: [],
+                                allowedBookIds: [], allowedClassIds: [],
+                                expiresAt: '', isActive: true
+                            };
 
                             const handleCreateCoupon = async (e) => {
                                 e.preventDefault();
@@ -1381,6 +1395,11 @@ export default function AdminDashboard() {
                                     allowedUniversities: parseArr(cp.allowedUniversities),
                                     allowedSemesters: parseArr(cp.allowedSemesters),
                                     allowedStates: parseArr(cp.allowedStates),
+                                    allowedTypes: parseArr(cp.allowedTypes),
+                                    allowedCourseIds: parseArr(cp.allowedCourseIds),
+                                    allowedEbookIds: parseArr(cp.allowedEbookIds),
+                                    allowedBookIds: parseArr(cp.allowedBookIds),
+                                    allowedClassIds: parseArr(cp.allowedClassIds),
                                     expiresAt: cp.expiresAt ? new Date(cp.expiresAt).toISOString().split('T')[0] : '',
                                     isActive: cp.isActive,
                                 });
@@ -1618,6 +1637,122 @@ export default function AdminDashboard() {
                                                 </div>
                                             </div>
 
+                                            {/* Product Coverage Restrictions — Which items qualify? */}
+                                            <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1.2rem', marginBottom: '1.2rem' }}>
+                                                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '1.2rem' }}>
+                                                    <ShoppingBag size={20} color="#64748b" />
+                                                    <div>
+                                                        <div style={{ fontWeight: 800, fontSize: '0.9rem', color: '#1e293b' }}>Product Coverage — Which items qualify?</div>
+                                                        <div style={{ fontSize: '0.78rem', color: '#64748b', marginTop: '3px', lineHeight: 1.6 }}>
+                                                            Restrict this coupon to specific product types or individual items.<br />
+                                                            <strong>Leave categories unchecked = works for everything.</strong>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                                                    {/* Category Selection */}
+                                                    <div>
+                                                        <label style={{ ...labelStyle, marginBottom: '8px' }}>🏷 Product Categories</label>
+                                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                                                            {['courses', 'ebooks', 'books', 'classes'].map(t => (
+                                                                <label key={t} style={{
+                                                                    display: 'flex', alignItems: 'center', gap: '6px',
+                                                                    padding: '6px 12px', borderRadius: '20px', cursor: 'pointer',
+                                                                    fontSize: '0.82rem', fontWeight: 600,
+                                                                    background: couponForm.allowedTypes.includes(t) ? '#3b82f6' : '#fff',
+                                                                    color: couponForm.allowedTypes.includes(t) ? '#fff' : '#1e293b',
+                                                                    border: '1px solid ' + (couponForm.allowedTypes.includes(t) ? '#3b82f6' : '#cbd5e1')
+                                                                }}>
+                                                                    <input type="checkbox" hidden checked={couponForm.allowedTypes.includes(t)} onChange={() => setCouponForm(f => ({ ...f, allowedTypes: f.allowedTypes.includes(t) ? f.allowedTypes.filter(x => x !== t) : [...f.allowedTypes, t] }))} />
+                                                                    {t === 'books' ? 'Bookstore' : t.charAt(0).toUpperCase() + t.slice(1)}
+                                                                </label>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Item Specific Restrictions */}
+                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                                        {couponForm.allowedTypes.includes('courses') && (
+                                                            <div>
+                                                                <label style={{ ...labelStyle, fontSize: '0.75rem', marginBottom: '4px' }}>🎓 Specific Courses (optional)</label>
+                                                                <details style={{ position: 'relative' }}>
+                                                                    <summary style={{ listStyle: 'none', padding: '0.5rem 0.8rem', background: '#fff', border: '1.5px solid #cbd5e1', borderRadius: '8px', cursor: 'pointer', fontSize: '0.82rem', display: 'flex', justifyContent: 'space-between' }}>
+                                                                        <span>{couponForm.allowedCourseIds.length ? `${couponForm.allowedCourseIds.length} selected` : 'Any Course'}</span>
+                                                                        <span>▼</span>
+                                                                    </summary>
+                                                                    <div style={{ position: 'absolute', zIndex: 999, left: 0, right: 0, top: '100%', padding: '6px', background: '#fff', border: '1.5px solid #cbd5e1', borderRadius: '8px', maxHeight: '150px', overflowY: 'auto', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                                                                        {courses.map(c => (
+                                                                            <label key={c.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 6px', fontSize: '0.8rem', cursor: 'pointer' }}>
+                                                                                <input type="checkbox" checked={couponForm.allowedCourseIds.includes(c.id)} onChange={() => setCouponForm(f => ({ ...f, allowedCourseIds: f.allowedCourseIds.includes(c.id) ? f.allowedCourseIds.filter(x => x !== c.id) : [...f.allowedCourseIds, c.id] }))} />
+                                                                                {c.title}
+                                                                            </label>
+                                                                        ))}
+                                                                    </div>
+                                                                </details>
+                                                            </div>
+                                                        )}
+                                                        {couponForm.allowedTypes.includes('ebooks') && (
+                                                            <div>
+                                                                <label style={{ ...labelStyle, fontSize: '0.75rem', marginBottom: '4px' }}>📖 Specific eBooks (optional)</label>
+                                                                <details style={{ position: 'relative' }}>
+                                                                    <summary style={{ listStyle: 'none', padding: '0.5rem 0.8rem', background: '#fff', border: '1.5 solid #cbd5e1', borderRadius: '8px', cursor: 'pointer', fontSize: '0.82rem', display: 'flex', justifyContent: 'space-between' }}>
+                                                                        <span>{couponForm.allowedEbookIds.length ? `${couponForm.allowedEbookIds.length} selected` : 'Any eBook'}</span>
+                                                                        <span>▼</span>
+                                                                    </summary>
+                                                                    <div style={{ position: 'absolute', zIndex: 999, left: 0, right: 0, top: '100%', padding: '6px', background: '#fff', border: '1.5px solid #cbd5e1', borderRadius: '8px', maxHeight: '150px', overflowY: 'auto', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                                                                        {ebooks.map(eb => (
+                                                                            <label key={eb.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 6px', fontSize: '0.8rem', cursor: 'pointer' }}>
+                                                                                <input type="checkbox" checked={couponForm.allowedEbookIds.includes(eb.id)} onChange={() => setCouponForm(f => ({ ...f, allowedEbookIds: f.allowedEbookIds.includes(eb.id) ? f.allowedEbookIds.filter(x => x !== eb.id) : [...f.allowedEbookIds, eb.id] }))} />
+                                                                                {eb.title}
+                                                                            </label>
+                                                                        ))}
+                                                                    </div>
+                                                                </details>
+                                                            </div>
+                                                        )}
+                                                        {couponForm.allowedTypes.includes('books') && (
+                                                            <div>
+                                                                <label style={{ ...labelStyle, fontSize: '0.75rem', marginBottom: '4px' }}>📦 Specific Bookstore Items (optional)</label>
+                                                                <details style={{ position: 'relative' }}>
+                                                                    <summary style={{ listStyle: 'none', padding: '0.5rem 0.8rem', background: '#fff', border: '1.5px solid #cbd5e1', borderRadius: '8px', cursor: 'pointer', fontSize: '0.82rem', display: 'flex', justifyContent: 'space-between' }}>
+                                                                        <span>{couponForm.allowedBookIds.length ? `${couponForm.allowedBookIds.length} selected` : 'Any Book'}</span>
+                                                                        <span>▼</span>
+                                                                    </summary>
+                                                                    <div style={{ position: 'absolute', zIndex: 999, left: 0, right: 0, top: '100%', padding: '6px', background: '#fff', border: '1.5px solid #cbd5e1', borderRadius: '8px', maxHeight: '150px', overflowY: 'auto', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                                                                        {bookstore.map(b => (
+                                                                            <label key={b.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 6px', fontSize: '0.8rem', cursor: 'pointer' }}>
+                                                                                <input type="checkbox" checked={couponForm.allowedBookIds.includes(b.id)} onChange={() => setCouponForm(f => ({ ...f, allowedBookIds: f.allowedBookIds.includes(b.id) ? f.allowedBookIds.filter(x => x !== b.id) : [...f.allowedBookIds, b.id] }))} />
+                                                                                {b.title}
+                                                                            </label>
+                                                                        ))}
+                                                                    </div>
+                                                                </details>
+                                                            </div>
+                                                        )}
+                                                        {couponForm.allowedTypes.includes('classes') && (
+                                                            <div>
+                                                                <label style={{ ...labelStyle, fontSize: '0.75rem', marginBottom: '4px' }}>🎙 Specific Live Classes (optional)</label>
+                                                                <details style={{ position: 'relative' }}>
+                                                                    <summary style={{ listStyle: 'none', padding: '0.5rem 0.8rem', background: '#fff', border: '1.5px solid #cbd5e1', borderRadius: '8px', cursor: 'pointer', fontSize: '0.82rem', display: 'flex', justifyContent: 'space-between' }}>
+                                                                        <span>{couponForm.allowedClassIds.length ? `${couponForm.allowedClassIds.length} selected` : 'Any Class'}</span>
+                                                                        <span>▼</span>
+                                                                    </summary>
+                                                                    <div style={{ position: 'absolute', zIndex: 999, left: 0, right: 0, top: '100%', padding: '6px', background: '#fff', border: '1.5px solid #cbd5e1', borderRadius: '8px', maxHeight: '150px', overflowY: 'auto', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                                                                        {liveClasses.map(c => (
+                                                                            <label key={c.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 6px', fontSize: '0.8rem', cursor: 'pointer' }}>
+                                                                                <input type="checkbox" checked={couponForm.allowedClassIds.includes(c.id)} onChange={() => setCouponForm(f => ({ ...f, allowedClassIds: f.allowedClassIds.includes(c.id) ? f.allowedClassIds.filter(x => x !== c.id) : [...f.allowedClassIds, c.id] }))} />
+                                                                                {c.title}
+                                                                            </label>
+                                                                        ))}
+                                                                    </div>
+                                                                </details>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                             <button type="submit" style={{ ...btnGreen, display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                 <Save size={15} /> {editingCouponId ? 'Save Changes' : 'Create Coupon'}
                                             </button>
@@ -1643,6 +1778,10 @@ export default function AdminDashboard() {
                                                     const univs = cp.allowedUniversities ? JSON.parse(cp.allowedUniversities) : [];
                                                     const sems = cp.allowedSemesters ? JSON.parse(cp.allowedSemesters) : [];
                                                     const states = cp.allowedStates ? JSON.parse(cp.allowedStates) : [];
+                                                    const types = cp.allowedTypes ? JSON.parse(cp.allowedTypes) : [];
+                                                    const ebIds = cp.allowedEbookIds ? JSON.parse(cp.allowedEbookIds) : [];
+                                                    const bIds = cp.allowedBookIds ? JSON.parse(cp.allowedBookIds) : [];
+                                                    const cIds = cp.allowedClassIds ? JSON.parse(cp.allowedClassIds) : [];
                                                     return (
                                                         <tr key={cp.id} style={{ borderBottom: '1px solid #f8fafc' }}>
                                                             <td style={td}>
@@ -1657,10 +1796,14 @@ export default function AdminDashboard() {
                                                             </td>
                                                             <td style={td}>
                                                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', maxWidth: '180px' }}>
+                                                                    {types.map(t => <span key={t} style={{ ...catBadge, background: '#f8fafc', color: '#64748b', fontSize: '0.65rem' }}>TYPE: {t}</span>)}
                                                                     {univs.map(u => <span key={u} style={{ ...catBadge, background: '#ecfdf5', color: '#059669', fontSize: '0.65rem' }}>{u.replace(' University', '')}</span>)}
                                                                     {sems.map(s => <span key={s} style={{ ...catBadge, background: '#eff6ff', color: '#2563eb', fontSize: '0.65rem' }}>{s}</span>)}
                                                                     {states.map(s => <span key={s} style={{ ...catBadge, background: '#fef3c7', color: '#d97706', fontSize: '0.65rem' }}>{s}</span>)}
-                                                                    {!univs.length && !sems.length && !states.length && <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>No restrictions</span>}
+                                                                    {ebIds.length > 0 && <span style={{ ...catBadge, background: '#f0fdf4', color: '#166534', fontSize: '0.65rem' }}>{ebIds.length} eBooks</span>}
+                                                                    {bIds.length > 0 && <span style={{ ...catBadge, background: '#fff7ed', color: '#9a3412', fontSize: '0.65rem' }}>{bIds.length} Books</span>}
+                                                                    {cIds.length > 0 && <span style={{ ...catBadge, background: '#f5f3ff', color: '#5b21b6', fontSize: '0.65rem' }}>{cIds.length} Classes</span>}
+                                                                    {!types.length && !univs.length && !sems.length && !states.length && <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Catalog-wide</span>}
                                                                 </div>
                                                             </td>
                                                             <td style={{ ...td, fontWeight: 700 }}>
