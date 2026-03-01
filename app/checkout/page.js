@@ -195,7 +195,7 @@ function CheckoutContent() {
     };
 
     return (
-        <div className="container" style={{ maxWidth: '1100px', paddingTop: '5rem', paddingBottom: '6rem' }}>
+        <div className="container" style={{ maxWidth: '1100px', paddingTop: 'clamp(5rem, 14vw, 8rem)', paddingBottom: '6rem' }}>
             <style>{`
                 .checkout-h1 { font-size: 3rem; }
                 .checkout-grid {
@@ -208,7 +208,7 @@ function CheckoutContent() {
                     grid-template-columns: 1fr 1fr;
                     gap: 1.5rem;
                 }
-                .order-summary-box { position: sticky; top: 100px; }
+                .order-summary-box { position: sticky; top: 110px; }
                 .f-group { display: flex; flex-direction: column; gap: 8px; }
                 .f-group label { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
                 .f-group input, .f-group textarea {
@@ -228,11 +228,20 @@ function CheckoutContent() {
                 .f-err { font-size: 0.75rem; color: #ef4444; font-weight: 600; margin-top: 2px; display: flex; align-items: center; gap: 4px; }
                 .req { color: #ef4444; margin-left: 2px; }
                 .gradient-text { background: linear-gradient(135deg, #10b981, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+                .coupon-row { display: flex; gap: 10px; }
+                .coupon-row input { flex: 1; min-width: 0; }
+                .coupon-row button { flex-shrink: 0; }
+
                 @media (max-width: 768px) {
-                    .checkout-h1 { font-size: clamp(1.8rem, 6vw, 2.4rem) !important; margin-bottom: 2rem !important; }
-                    .checkout-grid { grid-template-columns: 1fr !important; gap: 2rem !important; }
+                    .checkout-h1 { font-size: clamp(1.6rem, 6vw, 2.2rem) !important; margin-bottom: 1.5rem !important; }
+                    .checkout-grid { grid-template-columns: 1fr !important; gap: 1.5rem !important; }
                     .checkout-form-grid { grid-template-columns: 1fr !important; gap: 1rem !important; }
-                    .order-summary-box { position: static !important; order: -1; }
+                    .order-summary-box { position: static !important; order: -1; width: 100% !important; }
+                }
+                @media (max-width: 480px) {
+                    .checkout-h1 { font-size: clamp(1.4rem, 6vw, 1.8rem) !important; }
+                    .coupon-row { flex-direction: row; gap: 8px; }
+                    .coupon-row button { padding: 0.7rem 0.9rem !important; font-size: 0.82rem !important; }
                 }
             `}</style>
 
@@ -363,7 +372,7 @@ function CheckoutContent() {
                             ) : (
                                 // Input state
                                 <>
-                                    <div style={{ display: 'flex', gap: '10px' }}>
+                                    <div className="coupon-row">
                                         <input
                                             type="text" placeholder="Enter coupon code"
                                             value={couponCode}
