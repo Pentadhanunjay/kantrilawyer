@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+.next/
+
+# Environment files (contain secrets — never commit)
+.env
+.env.local
+.env.production
+
+# Prisma
+prisma/migrations/
+
+# OS
+.DS_Store
+Thumbs.db
