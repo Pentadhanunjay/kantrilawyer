@@ -1,8 +1,7 @@
 import './globals.css';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import { AuthProvider } from '@/context/AuthContext';
-import PageProgress from '@/components/PageProgress';
+import { CartProvider } from '@/context/CartContext';
+import RootShell from '@/components/RootShell';
 import Script from 'next/script';
 
 export const metadata = {
@@ -13,8 +12,6 @@ export const metadata = {
   },
 };
 
-import { CartProvider } from '@/context/CartContext';
-
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
@@ -22,12 +19,9 @@ export default function RootLayout({ children }) {
         <Script src="https://checkout.razorpay.com/v1/checkout.js" />
         <AuthProvider>
           <CartProvider>
-            <PageProgress />
-            <Navbar />
-            <main style={{ minHeight: 'calc(100vh - 100px)', paddingTop: '100px', background: 'white' }}>
+            <RootShell>
               {children}
-            </main>
-            <Footer />
+            </RootShell>
           </CartProvider>
         </AuthProvider>
       </body>
